@@ -1,4 +1,5 @@
 package com.example.momomo;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,21 +13,22 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class  Register extends AppCompatActivity {
-    EditText email, password, password1;
-    Button bregister;
+public class Register extends AppCompatActivity {
+    EditText name, email, password, cpassword;
+
+    Button buttonRegister;
     private FirebaseAuth mAuth;
+
     @Override
     public void onStart() {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent i2=new Intent(getApplicationContext(),Quiz1.class);
+            Intent i2=new Intent(getApplicationContext(),MainActivity.class);
             startActivity(i2);
             finish();
         }
@@ -36,28 +38,34 @@ public class  Register extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        name = findViewById(R.id.usernameEditText);
         email = findViewById(R.id.emailEditText);
         password = findViewById(R.id.passwordEditText);
-        password1 = findViewById(R.id.repeatPasswordEditText);
-        bregister = findViewById(R.id.Register);
-
-        bregister.setOnClickListener(new View.OnClickListener() {
+        cpassword = findViewById(R.id.repeatPasswordEditText);
+        buttonRegister = findViewById(R.id.Register);
+        mAuth=FirebaseAuth.getInstance();
+        buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String mail = email.getText().toString();
-                String pass = password.getText().toString();
-                String pass1 = password1.getText().toString();
 
-                if (TextUtils.isEmpty(mail) || TextUtils.isEmpty(pass) || TextUtils.isEmpty(pass1)) {
-                    Toast.makeText(Register.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                String strName = name.getText().toString();
+                String strEmail = email.getText().toString();
+                String strPassword = password.getText().toString();
+                String strCPassword = cpassword.getText().toString();
+
+                if(TextUtils.isEmpty(strEmail)){
+                    Toast.makeText(Register.this,"Enter Email",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                mAuth.createUserWithEmailAndPassword(mail, pass)
+                if(TextUtils.isEmpty(strPassword)){
+                    Toast.makeText(Register.this,"Enter Password",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mAuth.createUserWithEmailAndPassword(strEmail, strPassword)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()&& pass.equals(pass1)){
+                                if (task.isSuccessful()&& strPassword.equals(strCPassword)){
                                     Toast.makeText(Register.this, "Account created.",
                                             Toast.LENGTH_SHORT).show();
                                     Intent intent = new Intent(Register.this, MainActivity.class);
@@ -69,8 +77,10 @@ public class  Register extends AppCompatActivity {
                                 }
                             }
                         });
-
             }
         });
+
     }
+
+
 }

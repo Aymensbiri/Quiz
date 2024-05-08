@@ -41,6 +41,7 @@ public class Quiz1 extends AppCompatActivity {
                 } else {
                     Toast.makeText(Quiz1.this, "Please select an option", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
     }

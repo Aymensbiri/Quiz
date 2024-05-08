@@ -1,56 +1,92 @@
 package com.example.momomo;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
-    EditText Mail,password;
+public class  MainActivity extends AppCompatActivity {
+
+    EditText email,password;
     Button sign;
-    TextView register;
+    Button Register;
+    private FirebaseAuth mAuth;
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            Intent i2=new Intent(getApplicationContext(),Quiz1.class);
+            startActivity(i2);
+            finish();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Mail=findViewById(R.id.email);
+        email=findViewById(R.id.email);
         password=findViewById(R.id.password);
         sign=findViewById(R.id.signin);
+        mAuth= FirebaseAuth.getInstance();
         sign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Mail.getText().toString().equals("aymoud") && password.getText().toString().equals("6378")) {
-                    Intent intent = new Intent(getApplicationContext(), Quiz1.class);
-                    startActivity(intent);
-                } else {
+                String strEmail = email.getText().toString();
+                String strPassword = password.getText().toString();
 
-                    Toast.makeText(getApplicationContext(), "login et password incorrects", Toast.LENGTH_SHORT).show();
-                    register = findViewById(R.id.Register);
-                    register.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent2 = new Intent(getApplicationContext(), Register.class);
-                            startActivity(intent2);
-
-                        }
-
-
-                    });
+                if(TextUtils.isEmpty(strEmail)){
+                    Toast.makeText(MainActivity.this,"Enter Email",Toast.LENGTH_SHORT).show();
+                    return;
                 }
+                if(TextUtils.isEmpty(strPassword)){
+                    Toast.makeText(MainActivity.this,"Enter Password",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                mAuth.signInWithEmailAndPassword(strEmail, strPassword)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getApplicationContext(), "Login Successfully.",
+                                            Toast.LENGTH_SHORT).show();
+                                    Intent i2=new Intent(getApplicationContext(),Quiz1.class);
+                                    startActivity(i2);
+                                    finish();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Authentication failed.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
             }
 
-
         });
-
-        }
+        Register =findViewById(R.id.Register);
+        Register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i2=new Intent(getApplicationContext(),Register.class);
+                Toast.makeText(getApplicationContext(), "register",
+                        Toast.LENGTH_SHORT).show();
+                startActivity(i2);
+            }
+        });
     }
-
-
+}
